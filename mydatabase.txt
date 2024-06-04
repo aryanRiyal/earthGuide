@@ -1,0 +1,133 @@
+{ name: "Asia", size:"44,579,000 sq. km", countries: 48, population: 4436224000, habitable: true };
+{ name: "Europe", size:"10,180,000 sq km", countries: 50, population: 738849000, habitable: true }
+{ name: "Africa", size:"30,221,532 sq km", countries: 54, population: 1216130000, habitable: true }
+{ name: "Australia", size:"8,525,989 sq km", countries: 3, population: 39901000, habitable: true }
+{ name: "North America", size:"24,709,000 sq km", countries: 23, population: 579024000, habitable: true }
+{ name: "South America", size:"17,840,000 sq km",  countries: 12,  population: 422535000,  habitable: true }
+{ name: "Antarctica", size:"14,000,000 sq km",  countries: 0, population: 1106, habitable: false }
+
+//Continents and Wonders
+Asia - ["Petra", "Taj Mahal", "The Great Wall of China"]
+Europe - ["Colosseum"]
+Australia
+Africa
+North America - ["Chichén Itzá"]
+South America - ["Christ the Redeemer", "Machu Picchu"]
+Antarctica
+
+//JSON FORMAT
+
+//Continents
+{ 
+        "name": "Asia",
+        "size":"44,579,000 sq. km",
+        "countries": 48,
+        "population": 4436224000,
+        "habitable": true,
+        "funFact" : "Asia is the world's largest continent of the seven continents in size and population."
+}
+
+{ 
+        "name": "Europe",
+        "size":"10,180,000 sq km",
+        "countries": 50,
+        "population": 738849000,
+        "habitable": true,
+        "funFact" : "Europe and Asia are parts of the same major landmass -- Europe is separated from Asia by the Ural mountains and the Caspian Sea."
+}
+
+{
+        "name": "Africa",
+        "size":"30,221,532 sq km",
+        "countries": 54,
+        "population": 1216130000,
+        "habitable": true,
+        "funFact" : "Of the seven continents of the world, Africa is the second largest."
+}
+
+{
+        "name": "Australia",
+        "size":"8,525,989 sq km",
+        "countries": 3,
+        "population": 39901000,
+        "habitable": true,
+        "funFact" : "Australia is the world's smallest continent and is also known as an 'island continent' as it is surrounded by water on all sides."
+}
+
+{
+        "name": "North America",
+        "size":"24,709,000 sq km",
+        "countries": 23,
+        "population": 579024000,
+        "habitable": true,
+        "funFact" : "North America has five time zones and is the only continent with every type of climate."
+}
+
+{ 
+        "name": "South America",
+        "size":"17,840,000 sq km",  
+        "countries": 12,  
+        "population": 422535000,
+        "habitable": true,
+        "funFact" : "The world's largest river as per water volume and the second longest (6440 km) -- the Amazon -- is in South America."
+}
+
+{ 
+        "name": "Antarctica", 
+        "size":"14,000,000 sq km",  
+        "countries": 0, 
+        "population": 1106, 
+        "habitable": false,
+        "funFact" : "Antarctica is not only the coldest place on Earth but also the highest, driest, windiest and emptiest."
+}
+
+//World wonders
+
+{
+        "name": "Colosseum",
+        "location": "Rome, Italy",
+        "continent": "Europe",
+        "yearBuilt": "80 AD"
+}
+
+{
+        "name": "Taj Mahal",
+        "location": "Agra, India",
+        "continent": "Asia",
+        "yearBuilt": "1643 AD"
+}
+
+{
+        "name": "Petra",
+        "location": "Ma'an, Jordan",
+        "continent": "Asia",
+        "yearBuilt": "312 BC"
+}
+
+{
+        "name": "Chichén Itzá",
+        "location": "Yucatán, Mexico",
+        "continent": "North America",
+        "yearBuilt": "600 AD"
+}
+
+{
+        "name": "Christ the Redeemer",
+        "location": "Rio de Janeiro, Brazil",
+        "continent": "South America",
+        "yearBuilt": "1931 AD"
+}
+
+{
+        "name": "Machu Picchu",
+        "location": "Cuzco Region, Peru",
+        "continent": "South America",
+        "yearBuilt": "1450 AD"
+}
+
+{
+        "name": "The Great Wall of China",
+        "location": "China",
+        "continent": "Asia",
+        "yearBuilt": "700 BC"
+}

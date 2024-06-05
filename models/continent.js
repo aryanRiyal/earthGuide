@@ -48,7 +48,5 @@ const continentSchema = new mongoose.Schema({
 // }, { autoIndex: false } );
 }, { autoIndex: true } );
 
-// continentSchema.index({ wonders: 1 }, { unique: true, sparse: true });
-
 const Continent = mongoose.model('Continent', continentSchema);
 module.exports = { ContinentsEnum, Continent };

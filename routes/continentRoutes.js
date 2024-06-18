@@ -19,6 +19,7 @@ router.get('/', async (req, res) => {
 //C - Create
 router.post('/new', async function(req, res) {
     const data = req.body;
+    data.name = data.name.trim();
     if(ContinentsEnum.includes(data.name)) {
         try{
             // We can directly pass data to Continent() instead of redundantly changing one by one.
@@ -37,7 +38,7 @@ router.post('/new', async function(req, res) {
 
 //R - Read
 router.get('/:name', async (req, res) => {
-    const continentName = req.params.name;
+    const continentName = req.params.name.trim();
     if(ContinentsEnum.includes(continentName)) {
         try{
             const continentDetails = await Continent.findOne({name: continentName}).populate('wonders');
@@ -63,7 +64,7 @@ router.put('/:name', getContinentIdByName, async (req, res) => {
         const continentID = req.continentID;
         const updatedData = req.body;
         const updatedContinent = await Continent.findByIdAndUpdate(continentID, updatedData, {
-            new: true,      //Return the updated Document
+            new: true,                      //Return the updated Document
             runValidators: true     //Run Mongoose Validations
         });
         if(!updatedContinent) {
@@ -86,7 +87,12 @@ router.delete('/:name',  getContinentIdByName, async (req, res) => {
             if(!deletedContinent) {
                 return res.status(404).json({error: "Continent not found"});
             }
-            console.log("Continent Information deleted");
+            // await WorldWonder.updateMany(
+            //     { continentInfo: continentID }, 
+            //     { $set:{ continentInfo: null } }
+            // );
+            await WorldWonder.deleteMany({ continentInfo: continentID });
+            console.log("Continent Information deleted and Wonder updated");
             res.status(200).json({message: "Continent Information deleted Successfully"});
         } else {
             console.error("Error: Continent ID not found");

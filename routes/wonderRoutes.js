@@ -7,8 +7,9 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try{
-        const data = await WorldWonder.find().populate('continent');
         // const data = await WorldWonder.find();
+        // const data = await WorldWonder.find().populate('continent');
+        const data = await WorldWonder.find().populate('continentInfo');
         console.log("Data Fetched - Successfully");
         res.status(200).json(data);
     } catch (err) {
@@ -20,16 +21,18 @@ router.get('/', async (req, res) => {
 //C-Create
 router.post('/new', async (req, res) => {
     const data = req.body;
-    if(WorldWonderEnum.includes(data.name) && ContinentsEnum.includes(data.continent)) {
+    data.name = data.name.trim();
+    data.continentName = data.continentName.trim();
+    if(WorldWonderEnum.includes(data.name) && ContinentsEnum.includes(data.continentName)) {
         try{
-            const continentDetails = await Continent.findOne({ name: data.continent });
+            const continentDetails = await Continent.findOne({ name: data.continentName });
             if(!continentDetails) {
-                return res.status(404).json({ error: `Continent ${data.continent} not found` });
+                return res.status(404).json({ error: `Continent ${data.continentName} not found` });
             }
             const continentID = continentDetails._id;
             const newWonder = new WorldWonder({
                 ...data,
-                continent: continentID
+                continentInfo: continentID
             });
             const savedWonder = await newWonder.save();
             await Continent.findByIdAndUpdate( continentID, {
@@ -48,10 +51,10 @@ router.post('/new', async (req, res) => {
 
 //R-Read
 router.get('/:name', async (req, res) => {
-    const wonderName = req.params.name;
+    const wonderName = req.params.name.trim();
     if(WorldWonderEnum.includes(wonderName)) {
         try{
-            const wonderDetails = await WorldWonder.findOne({name: wonderName}).populate('continent');
+            const wonderDetails = await WorldWonder.findOne({name: wonderName}).populate('continentInfo');
             if(wonderDetails) {
                 console.log(`Details Fetched for Wonder: ${wonderName}`);
                 res.status(200).json(wonderDetails);
@@ -91,12 +94,16 @@ router.put('/:name', getWonderIdByName, async (req, res) => {
 router.delete('/:name',  getWonderIdByName, async (req, res) => {
     try{
         const wonderID = req.wonderID;
+        const continentID = req.continentID;
         if(wonderID) {
             const deletedWonder = await WorldWonder.findByIdAndDelete(wonderID);
             if(!deletedWonder) {
                 return res.status(404).json({error: "Wonder not found"});
             }
-            console.log("Wonder Information deleted");
+            await Continent.findByIdAndUpdate( continentID, {
+                $pull: { wonders: wonderID }
+            });
+            console.log("Wonder Information deleted and Continent Info Updated");
             res.status(200).json({message: "Wonder Information deleted Successfully"});
         } else {
             console.error("Error: Wonder ID not found");

@@ -17,8 +17,8 @@ app.get('/', function(req, res) {
     res.send("Welcome to Earth!!");
 });
 
-app.use('/continent', continentRoutes);
-app.use('/wonder', wonderRoutes);
+app.use('/continents', continentRoutes);
+app.use('/wonders', wonderRoutes);
 
 const server = app.listen(PORT, () => {
     console.log(`Server Running on ${PORT}`);

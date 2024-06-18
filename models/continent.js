@@ -16,7 +16,7 @@ const continentSchema = new mongoose.Schema({
         required: true,
         enum: ContinentsEnum,
         unique: true,
-        sparse: true
+        // sparse: true
     },
     size: {
         type: String,
@@ -47,6 +47,7 @@ const continentSchema = new mongoose.Schema({
     }
 // }, { autoIndex: false } );
 }, { autoIndex: true } );
+// });
 
 const Continent = mongoose.model('Continent', continentSchema);
 module.exports = { ContinentsEnum, Continent };

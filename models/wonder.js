@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ContinentsEnum } = require('./continent');
 
 const WorldWonderEnum = [
     'Colosseum',
@@ -21,10 +22,22 @@ const wonderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    continent: {
+    // continent: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Continent',
+    //     required: true
+    // },
+    continentName: {
+        type: String,
+        required: true,
+        enum: ContinentsEnum,
+        //unique: true
+    },
+    continentInfo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Continent',
         required: true,
+        // sparse: true
     },
     yearBuilt: {
         type: String

@@ -1,66 +1,56 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+// require('dotenv').config();
+// const mongoose = require('mongoose');
 const path = require('path');
 
-const { seedContinents, seedWonders, emptyContinents, emptyWonders } = require('./script/seederFunctions');
+const { seedContinents, seedWonders, emptyContinents, emptyWonders, dropDatabase } = require('./script/seederFunctions');
 const { connectDB, closeDB } = require('./config/db');
 
 // Define the file paths
 const continentFilePath = path.join(__dirname, 'data', 'continents.txt');
 const wonderFilePath = path.join(__dirname, 'data', 'wonders.txt');
 
-// Main function to seed database based on arguments
+const Flags = ['continents', 'wonders', 'all', 'empty', 'empty-continents', 'empty-wonders'];
+
+//Main function to seed database based on arguments
 const seedDatabase = async () => {
-    const args = process.argv.slice(2);
-    const seedContinentsFlag = args.includes('continents');
-    const seedWondersFlag = args.includes('wonders');
-    const emptyAllFlag = args.includes('empty');
-    const emptyContinentsFlag = args.includes('empty-continents');
-    const emptyWondersFlag = args.includes('empty-wonders');
-
+    await connectDB();
     try {
-        connectDB();
+        const args = process.argv.slice(2);
+        const invalidArgs = args.filter(arg => !Flags.includes(arg));
+        if(invalidArgs.length > 0) {
+            console.log('\nInvalid flags provided: ', invalidArgs.join(', '));
+            console.log(`Available flags are: [ ' ${Flags.join(' \', \' ')} ' ]\n`);
+            await closeDB();
+            return;
+        }
+        if(args.length === 0) {
+            args.push('all');
+        }
 
-        // Empty continents if requested
-        if (emptyContinentsFlag) {
+        const flags = Flags.reduce((acc, flag) => {
+            acc[flag] = args.includes(flag);
+            return acc;
+    }, {});
+
+        if(flags.empty || flags['empty-continents']) {
             await emptyContinents();
         }
-
-        // Empty wonders if requested
-        else if (emptyWondersFlag) {
+        if(flags.empty || flags['empty-wonders']) {
             await emptyWonders();
         }
-
-        //Empty Both
-        else if(emptyAllFlag) {
-            await emptyContinents();
-            await emptyWonders();
-        }
-
-        // Seed continents if requested
-        else if (seedContinentsFlag) {
+        if(flags.all || flags.continents) {
             await seedContinents(continentFilePath);
-            console.log('Database seeding completed');
         }
-
-        // Seed wonders if requested
-        else if (seedWondersFlag) {
+        if(flags.all || flags.wonders) {
             await seedWonders(wonderFilePath);
-            console.log('Database seeding completed');
         }
-
-        // Seed both continents and wonders if no specific flags provided
-        else if (!seedContinentsFlag && !seedWondersFlag) {
-            console.log('No seeding flags provided. Seeding both continents and wonders.');
-            await seedContinents(continentFilePath);
-            await seedWonders(wonderFilePath);
-            console.log('Database seeding completed');
+        if(flags.empty) {
+            await dropDatabase();
         }
-        closeDB();
-    } catch (error) {
-        console.error('Error seeding database:', error);
-        mongoose.connection.close();
+        await closeDB();
+    } catch (err) {
+        console.error('Error seeding database:', err);
+        await closeDB();
     }
 };
-
 seedDatabase();

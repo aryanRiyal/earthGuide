@@ -1,15 +1,14 @@
+const mongoose = require('mongoose');
 const fs = require('fs');
 const { ContinentsEnum, Continent } = require('../models/continent');
 const { WorldWonderEnum, WorldWonder } = require('../models/wonder');
-// const { ContinentsEnum } = require('./models/continent');
-// const { WorldWonderEnum } = require('./models/wonder');
 
-// Helper function to read data from file
+// Helper function to read data from a file
 const readDataFromFile = (filePath) => {
     return fs.readFileSync(filePath, 'utf-8').split('\n').filter(Boolean);
 };
 
-// Helper function to trim and validate continent name
+// Helper function to validate continent name
 const validateContinentName = (name) => {
     const trimmedName = name.trim();
     if (!ContinentsEnum.includes(trimmedName)) {
@@ -18,7 +17,7 @@ const validateContinentName = (name) => {
     return trimmedName;
 };
 
-// Helper function to trim and validate wonder name
+// Helper function to validate wonder name
 const validateWonderName = (name) => {
     const trimmedName = name.trim();
     if (!WorldWonderEnum.includes(trimmedName)) {
@@ -27,7 +26,45 @@ const validateWonderName = (name) => {
     return trimmedName;
 };
 
-// Function to seed continents
+// Function to empty continents collection
+const emptyContinents = async () => {
+    try {
+        // const continents = await Continent.find();
+        // const continentIds = continents.map(continent => continent._id);
+        // // Remove all wonders referencing the continents
+        // await WorldWonder.deleteMany({ continent: { $in: continentIds } });
+
+        await Continent.deleteMany({});
+        console.log('Continents collection emptied!');
+    } catch (error) {
+        console.error('Error emptying continents:', error);
+    }
+};
+
+// Function to empty wonders collection
+const emptyWonders = async () => {
+    try {
+        // Remove wonders from continents
+        await Continent.updateMany({}, { $set: { wonders: [] } });
+
+        await WorldWonder.deleteMany({});
+        console.log('Wonders collection emptied!');
+    } catch (error) {
+        console.error('Error emptying wonders:', error);
+    }
+};
+
+// Function to drop the database
+const dropDatabase = async () => {
+    try {
+        await mongoose.connection.db.dropDatabase();
+        console.log('Database dropped!');
+    } catch (error) {
+        console.error('Error dropping database:', error);
+    }
+};
+
+// Function to seed continents data
 const seedContinents = async (filePath) => {
     try {
         const continentsData = readDataFromFile(filePath);
@@ -50,49 +87,34 @@ const seedContinents = async (filePath) => {
     }
 };
 
-// Function to seed wonders
+// Function to seed wonders data
 const seedWonders = async (filePath) => {
     try {
         const wondersData = readDataFromFile(filePath);
+        await emptyWonders();
         const wonders = await Promise.all(wondersData.map(async line => {
-            const [name, location, continentName, yearBuilt] = line.split('|').map(item => item.trim());
+            const [name, location, continentName, continentInfo, yearBuilt] = line.split('|').map(item => item.trim());
             const continent = await Continent.findOne({ name: validateContinentName(continentName) });
             if (!continent) {
                 throw new Error(`Continent not found for wonder: ${name}`);
             }
-            return {
+            const wonder = new WorldWonder({
                 name: validateWonderName(name),
                 location,
-                continent: continent._id,
+                continentName,
+                continentInfo: continent._id,
                 yearBuilt
-            };
+            });
+            await wonder.save();
+            // Update the continent's wonders array
+            continent.wonders.push(wonder._id);
+            await continent.save();
+            return wonder;
         }));
-        await emptyWonders();
-        await WorldWonder.insertMany(wonders);
-        console.log('Wonders seeded!');
+        console.log('Wonders seeded and continents updated!');
     } catch (error) {
         console.error('Error seeding wonders:', error);
     }
 };
 
-// Function to empty continents
-const emptyContinents = async () => {
-    try {
-        await Continent.deleteMany({});
-        console.log('Continents collection emptied!');
-    } catch (error) {
-        console.error('Error emptying continents:', error);
-    }
-};
-
-// Function to empty wonders
-const emptyWonders = async () => {
-    try {
-        await WorldWonder.deleteMany({});
-        console.log('Wonders collection emptied!');
-    } catch (error) {
-        console.error('Error emptying wonders:', error);
-    }
-};
-
-module.exports = { seedContinents, seedWonders, emptyContinents, emptyWonders };
+module.exports = { seedContinents, seedWonders, emptyContinents, emptyWonders,  dropDatabase };

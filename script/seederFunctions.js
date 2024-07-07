@@ -29,11 +29,7 @@ const validateWonderName = (name) => {
 // Function to empty continents collection
 const emptyContinents = async () => {
     try {
-        // const continents = await Continent.find();
-        // const continentIds = continents.map(continent => continent._id);
-        // // Remove all wonders referencing the continents
-        // await WorldWonder.deleteMany({ continent: { $in: continentIds } });
-
+        await WorldWonder.deleteMany({});
         await Continent.deleteMany({});
         console.log('Continents collection emptied!');
     } catch (error) {
@@ -46,7 +42,6 @@ const emptyWonders = async () => {
     try {
         // Remove wonders from continents
         await Continent.updateMany({}, { $set: { wonders: [] } });
-
         await WorldWonder.deleteMany({});
         console.log('Wonders collection emptied!');
     } catch (error) {
@@ -68,8 +63,10 @@ const dropDatabase = async () => {
 const seedContinents = async (filePath) => {
     try {
         const continentsData = readDataFromFile(filePath);
-        const continents = continentsData.map(line => {
-            const [name, size, countries, population, habitable, funFact] = line.split('|').map(item => item.trim());
+        const continents = continentsData.map((line) => {
+            const [name, size, countries, population, habitable, funFact] = line
+                .split('|')
+                .map((item) => item.trim());
             return {
                 name: validateContinentName(name),
                 size,
@@ -92,29 +89,35 @@ const seedWonders = async (filePath) => {
     try {
         const wondersData = readDataFromFile(filePath);
         await emptyWonders();
-        const wonders = await Promise.all(wondersData.map(async line => {
-            const [name, location, continentName, continentInfo, yearBuilt] = line.split('|').map(item => item.trim());
-            const continent = await Continent.findOne({ name: validateContinentName(continentName) });
-            if (!continent) {
-                throw new Error(`Continent not found for wonder: ${name}`);
-            }
-            const wonder = new WorldWonder({
-                name: validateWonderName(name),
-                location,
-                continentName,
-                continentInfo: continent._id,
-                yearBuilt
-            });
-            await wonder.save();
-            // Update the continent's wonders array
-            continent.wonders.push(wonder._id);
-            await continent.save();
-            return wonder;
-        }));
+        const wonders = await Promise.all(
+            wondersData.map(async (line) => {
+                const [name, location, continentName, yearBuilt] = line
+                    .split('|')
+                    .map((item) => item.trim());
+                const continent = await Continent.findOne({
+                    name: validateContinentName(continentName)
+                });
+                if (!continent) {
+                    throw new Error(`Continent not found for wonder: ${name}`);
+                }
+                const wonder = new WorldWonder({
+                    name: validateWonderName(name),
+                    location,
+                    continentName,
+                    continentInfo: continent._id,
+                    yearBuilt
+                });
+                await wonder.save();
+                // Update the continent's wonders array
+                continent.wonders.push(wonder._id);
+                await continent.save();
+                return wonder;
+            })
+        );
         console.log('Wonders seeded and continents updated!');
     } catch (error) {
         console.error('Error seeding wonders:', error);
     }
 };
 
-module.exports = { seedContinents, seedWonders, emptyContinents, emptyWonders,  dropDatabase };
+module.exports = { seedContinents, seedWonders, emptyContinents, emptyWonders, dropDatabase };

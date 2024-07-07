@@ -7,8 +7,6 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try{
-        // const data = await WorldWonder.find();
-        // const data = await WorldWonder.find().populate('continent');
         const data = await WorldWonder.find().populate('continentInfo');
         console.log("Data Fetched - Successfully");
         res.status(200).json(data);

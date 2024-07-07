@@ -22,22 +22,15 @@ const wonderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    // continent: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Continent',
-    //     required: true
-    // },
     continentName: {
         type: String,
         required: true,
-        enum: ContinentsEnum,
-        //unique: true
+        enum: ContinentsEnum
     },
     continentInfo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Continent',
-        required: true,
-        // sparse: true
+        required: true
     },
     yearBuilt: {
         type: String
@@ -45,4 +38,4 @@ const wonderSchema = new mongoose.Schema({
 });
 
 const WorldWonder = mongoose.model('WorldWonder', wonderSchema);
-module.exports ={WorldWonderEnum, WorldWonder};
+module.exports = { WorldWonderEnum, WorldWonder };
